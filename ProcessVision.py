@@ -69,6 +69,10 @@ class GripPipeline:
         # Step Convex_Hulls0:
         self.__convex_hulls_contours = self.filter_contours_output
         (self.convex_hulls_output) = self.__convex_hulls(self.__convex_hulls_contours)
+        if(len(self.convex_hulls_output) > 0):
+            x,y,w,h = cv2.boundingRect(self.convex_hulls_output[0])
+            return x,y,w,h,self.convex_hulls_output[0]
+        return -1,-1,-1,-1,-1
 
 
     @staticmethod
@@ -415,13 +419,15 @@ if __name__ == "__main__":
         if result is None:
             continue
         x,y,w,h,c = result
-		
+        print("x = ",x)
+    
         
         exp = NetworkTables.getTable('SmartDashboard').getNumber('Exposure',1)
         if(exp != lastExposure):
             lastExposure = exp
             #VideoCamera.setExposureManual(camera,exp)
             camera.setExposureManual(int(exp))
+            
         
         if x != -1:
             cv2.rectangle(img, (x, y), (x+w, h+y), (255, 255, 255), 1)
@@ -486,7 +492,21 @@ if __name__ == "__main__":
             table.putNumber('distance', median)
             table.putNumber('left d', leftD)
             table.putNumber('right d', rightD)
-
+        
+        # if x != -1:       
+           
+            # table.putNumber('bearing left', bearingLeft)
+            # table.putNumber('bearing right', bearingRight)
+            # table.putNumber('elevationLeft', elevationLeft)
+            # table.putNumber('elevationRight', elevationRight)
+            # table.putNumber('bearing', bearing)
+            # table.putNumber('elevation', elevation)
+            # table.putNumber('distance', median)
+            # table.putNumber('left d', leftD)
+            # table.putNumber('right d', rightD)
+    
 
   			
         outputStream.putFrame(img)
+
+
